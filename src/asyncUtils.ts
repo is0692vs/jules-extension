@@ -6,6 +6,45 @@
  * @param iterator The async function to execute for each item.
  * @returns A promise that resolves to an array of results in the same order as items.
  */
+export class Semaphore {
+  private tasks: (() => void)[] = [];
+  private count: number;
+
+  constructor(count: number) {
+    this.count = count;
+  }
+
+  async acquire(): Promise<void> {
+    if (this.count > 0) {
+      this.count -= 1;
+      return Promise.resolve();
+    }
+    return new Promise<void>((resolve) => {
+      this.tasks.push(resolve);
+    });
+  }
+
+  release(): void {
+    if (this.tasks.length > 0) {
+      const next = this.tasks.shift();
+      if (next) {
+        next();
+      }
+    } else {
+      this.count += 1;
+    }
+  }
+
+  async run<T>(fn: () => Promise<T>): Promise<T> {
+    await this.acquire();
+    try {
+      return await fn();
+    } finally {
+      this.release();
+    }
+  }
+}
+
 export async function mapLimit<T, R>(
   items: T[],
   limit: number,

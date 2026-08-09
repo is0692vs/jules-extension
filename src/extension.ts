@@ -56,7 +56,7 @@ import {
   reviewPlanForSession,
 } from "./planDocumentProvider";
 import { JulesChatViewProvider } from "./chatView";
-import { mapLimit } from "./asyncUtils";
+import { mapLimit, Semaphore } from "./asyncUtils";
 import { buildSessionTooltip } from "./tooltipUtils";
 import {
   getActivityCategory,
@@ -974,21 +974,20 @@ export async function updatePreviousStates(
 
     // Fetch only unique PR statuses that are not in cache in parallel with concurrency limit
     if (urlsToFetch.length > 0) {
-      const urlsByRepo = new Map<string, string[]>();
-      for (let i = 0; i < urlsToFetch.length; i += 1) {
-        const url = urlsToFetch[i];
-        const repo = getPRStatusFetchGroupKey(url);
-        const list = urlsByRepo.get(repo) ?? [];
-        list.push(url);
-        urlsByRepo.set(repo, list);
-      }
+      const repoSemaphores = new Map<string, Semaphore>();
 
-      await mapLimit(Array.from(urlsByRepo.values()), 5, async (repoUrls) => {
-        await mapLimit(repoUrls, 5, async (url) => {
-          const isClosed = await checkPRStatus(url, token);
-          prStatusCacheChanged = true;
-          prStatusLookup.set(url, isClosed);
-        });
+      // フラット化された配列を使用し、グローバル上限25かつリポジトリ単位上限5を設定
+      await mapLimit(urlsToFetch, 25, async (url) => {
+        const repo = getPRStatusFetchGroupKey(url);
+        let semaphore = repoSemaphores.get(repo);
+        if (!semaphore) {
+          semaphore = new Semaphore(5);
+          repoSemaphores.set(repo, semaphore);
+        }
+
+        const isClosed = await semaphore.run(async () => checkPRStatus(url, token));
+        prStatusCacheChanged = true;
+        prStatusLookup.set(url, isClosed);
       });
     }
 
