@@ -5,7 +5,7 @@ import * as os from 'os';
 import * as path from 'path';
 import * as sinon from 'sinon';
 import * as vscode from 'vscode';
-import { applyPatchLocallyForSession } from '../applyPatchLocally';
+import { applyPatchLocallyForSession, resolveStartingBranchRef } from '../applyPatchLocally';
 import * as gitUtils from '../gitUtils';
 import * as sessionContextMenu from '../sessionContextMenu';
 import { ChangeSetSummary } from '../sessionArtifacts';
@@ -478,5 +478,58 @@ suite('applyPatchLocallyForSession ユニットテスト', () => {
         assert.match(showErrorMessageStub.firstCall.args[0], /Could not find an available branch name/);
         assert.strictEqual(repository.createBranch.called, false);
         assert.strictEqual(repository.getBranch.callCount, 20);
+    });
+});
+
+suite('resolveStartingBranchRef ユニットテスト', () => {
+    test('低優先度リモートが先に成功しても優先リモートを返すこと', async () => {
+        let resolveOrigin!: (value: unknown) => void;
+        const originResult = new Promise((resolve) => {
+            resolveOrigin = resolve;
+        });
+        const repository = {
+            state: { remotes: [{ name: 'upstream' }, { name: 'origin' }] },
+            getBranch: sinon.stub(),
+        };
+        repository.getBranch.withArgs('feature').rejects(new Error('branch not found'));
+        repository.getBranch.withArgs('origin/feature').returns(originResult);
+        repository.getBranch.withArgs('upstream/feature').resolves({ name: 'upstream/feature' });
+
+        const resultPromise = resolveStartingBranchRef(repository, 'feature');
+        await Promise.resolve();
+        resolveOrigin({ name: 'origin/feature' });
+        const result = await resultPromise;
+
+        assert.strictEqual(result, 'origin/feature');
+        assert.strictEqual(repository.getBranch.calledWith('upstream/feature'), true);
+    });
+
+    test('優先リモートが見つかれば未完了の後続リモートを待たないこと', async () => {
+        const repository = {
+            state: { remotes: [{ name: 'upstream' }, { name: 'origin' }] },
+            getBranch: sinon.stub(),
+        };
+        repository.getBranch.withArgs('feature').rejects(new Error('branch not found'));
+        repository.getBranch.withArgs('origin/feature').resolves({ name: 'origin/feature' });
+        repository.getBranch.withArgs('upstream/feature').returns(new Promise(() => {}));
+
+        const result = await resolveStartingBranchRef(repository, 'feature');
+
+        assert.strictEqual(result, 'origin/feature');
+    });
+
+    test('優先リモートの確認が失敗した場合は後続の有効なブランチを返さないこと', async () => {
+        const repository = {
+            state: { remotes: [{ name: 'upstream' }, { name: 'origin' }] },
+            getBranch: sinon.stub(),
+        };
+        repository.getBranch.withArgs('feature').rejects(new Error('branch not found'));
+        repository.getBranch.withArgs('origin/feature').rejects(new Error('repository is locked'));
+        repository.getBranch.withArgs('upstream/feature').resolves({ name: 'upstream/feature' });
+
+        await assert.rejects(
+            resolveStartingBranchRef(repository, 'feature'),
+            /repository is locked/,
+        );
     });
 });
