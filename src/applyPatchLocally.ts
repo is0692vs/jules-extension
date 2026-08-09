@@ -240,7 +240,7 @@ async function branchExists(repository: any, branchRef: string): Promise<boolean
     }
 }
 
-async function resolveStartingBranchRef(repository: any, startingBranch: string): Promise<string> {
+export async function resolveStartingBranchRef(repository: any, startingBranch: string): Promise<string> {
     const branchRef = startingBranch.trim();
     if (branchRef.length === 0) {
         return startingBranch;
@@ -263,10 +263,23 @@ async function resolveStartingBranchRef(repository: any, startingBranch: string)
             return a.localeCompare(b);
         });
 
-    for (const remoteName of remoteNames) {
-        const remoteRef = `${remoteName}/${branchRef}`;
-        if (await branchExists(repository, remoteRef)) {
-            return remoteRef;
+    const existsResults = remoteNames.map(async (remoteName: string) => {
+        try {
+            const remoteRef = `${remoteName}/${branchRef}`;
+            const exists = await branchExists(repository, remoteRef);
+            return { status: "fulfilled" as const, value: exists ? remoteRef : null };
+        } catch (reason) {
+            return { status: "rejected" as const, reason };
+        }
+    });
+
+    for (const resultPromise of existsResults) {
+        const result = await resultPromise;
+        if (result.status === "rejected") {
+            throw result.reason;
+        }
+        if (result.value) {
+            return result.value;
         }
     }
 
