@@ -263,15 +263,18 @@ export async function resolveStartingBranchRef(repository: any, startingBranch: 
             return a.localeCompare(b);
         });
 
-    const existsResults = await Promise.allSettled(
-        remoteNames.map(async (remoteName: string) => {
+    const existsResults = remoteNames.map(async (remoteName: string) => {
+        try {
             const remoteRef = `${remoteName}/${branchRef}`;
             const exists = await branchExists(repository, remoteRef);
-            return exists ? remoteRef : null;
-        })
-    );
+            return { status: "fulfilled" as const, value: exists ? remoteRef : null };
+        } catch (reason) {
+            return { status: "rejected" as const, reason };
+        }
+    });
 
-    for (const result of existsResults) {
+    for (const resultPromise of existsResults) {
+        const result = await resultPromise;
         if (result.status === "rejected") {
             throw result.reason;
         }

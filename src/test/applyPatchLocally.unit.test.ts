@@ -482,19 +482,40 @@ suite('applyPatchLocallyForSession ユニットテスト', () => {
 });
 
 suite('resolveStartingBranchRef ユニットテスト', () => {
-    test('優先リモートのブランチが見つかれば後続リモートの失敗より優先すること', async () => {
+    test('低優先度リモートが先に成功しても優先リモートを返すこと', async () => {
+        let resolveOrigin!: (value: unknown) => void;
+        const originResult = new Promise((resolve) => {
+            resolveOrigin = resolve;
+        });
+        const repository = {
+            state: { remotes: [{ name: 'upstream' }, { name: 'origin' }] },
+            getBranch: sinon.stub(),
+        };
+        repository.getBranch.withArgs('feature').rejects(new Error('branch not found'));
+        repository.getBranch.withArgs('origin/feature').returns(originResult);
+        repository.getBranch.withArgs('upstream/feature').resolves({ name: 'upstream/feature' });
+
+        const resultPromise = resolveStartingBranchRef(repository, 'feature');
+        await Promise.resolve();
+        resolveOrigin({ name: 'origin/feature' });
+        const result = await resultPromise;
+
+        assert.strictEqual(result, 'origin/feature');
+        assert.strictEqual(repository.getBranch.calledWith('upstream/feature'), true);
+    });
+
+    test('優先リモートが見つかれば未完了の後続リモートを待たないこと', async () => {
         const repository = {
             state: { remotes: [{ name: 'upstream' }, { name: 'origin' }] },
             getBranch: sinon.stub(),
         };
         repository.getBranch.withArgs('feature').rejects(new Error('branch not found'));
         repository.getBranch.withArgs('origin/feature').resolves({ name: 'origin/feature' });
-        repository.getBranch.withArgs('upstream/feature').rejects(new Error('repository is locked'));
+        repository.getBranch.withArgs('upstream/feature').returns(new Promise(() => {}));
 
         const result = await resolveStartingBranchRef(repository, 'feature');
 
         assert.strictEqual(result, 'origin/feature');
-        assert.strictEqual(repository.getBranch.calledWith('upstream/feature'), true);
     });
 
     test('優先リモートの確認が失敗した場合は後続の有効なブランチを返さないこと', async () => {
