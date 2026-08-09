@@ -5,7 +5,7 @@ import * as os from 'os';
 import * as path from 'path';
 import * as sinon from 'sinon';
 import * as vscode from 'vscode';
-import { applyPatchLocallyForSession } from '../applyPatchLocally';
+import { applyPatchLocallyForSession, resolveStartingBranchRef } from '../applyPatchLocally';
 import * as gitUtils from '../gitUtils';
 import * as sessionContextMenu from '../sessionContextMenu';
 import { ChangeSetSummary } from '../sessionArtifacts';
@@ -478,5 +478,37 @@ suite('applyPatchLocallyForSession ユニットテスト', () => {
         assert.match(showErrorMessageStub.firstCall.args[0], /Could not find an available branch name/);
         assert.strictEqual(repository.createBranch.called, false);
         assert.strictEqual(repository.getBranch.callCount, 20);
+    });
+});
+
+suite('resolveStartingBranchRef ユニットテスト', () => {
+    test('優先リモートのブランチが見つかれば後続リモートの失敗より優先すること', async () => {
+        const repository = {
+            state: { remotes: [{ name: 'upstream' }, { name: 'origin' }] },
+            getBranch: sinon.stub(),
+        };
+        repository.getBranch.withArgs('feature').rejects(new Error('branch not found'));
+        repository.getBranch.withArgs('origin/feature').resolves({ name: 'origin/feature' });
+        repository.getBranch.withArgs('upstream/feature').rejects(new Error('repository is locked'));
+
+        const result = await resolveStartingBranchRef(repository, 'feature');
+
+        assert.strictEqual(result, 'origin/feature');
+        assert.strictEqual(repository.getBranch.calledWith('upstream/feature'), true);
+    });
+
+    test('優先リモートの確認が失敗した場合は後続の有効なブランチを返さないこと', async () => {
+        const repository = {
+            state: { remotes: [{ name: 'upstream' }, { name: 'origin' }] },
+            getBranch: sinon.stub(),
+        };
+        repository.getBranch.withArgs('feature').rejects(new Error('branch not found'));
+        repository.getBranch.withArgs('origin/feature').rejects(new Error('repository is locked'));
+        repository.getBranch.withArgs('upstream/feature').resolves({ name: 'upstream/feature' });
+
+        await assert.rejects(
+            resolveStartingBranchRef(repository, 'feature'),
+            /repository is locked/,
+        );
     });
 });

@@ -54,6 +54,6 @@
 ## 2026-06-04 - [Performance] Optimize string prefix removal
 **Learning:** Using regular expressions like `.replace(/^sessions\//, '')` introduces unnecessary compilation and execution overhead compared to basic string operations.
 **Action:** When conditionally removing a fixed string prefix, prefer using `.startsWith()` combined with `.slice()` for better execution speed and reduced memory allocation.
-## 2025-02-15 - [Optimize remote branch resolution]
-**Learning:** Sequential remote branch exists checks were causing unneeded delay.
-**Action:** Replaced sequential loop with `Promise.all` to perform parallel branch checks.
+## 2026-08-01 - [リモートブランチ解決の並列化]
+**Learning:** リモートブランチの存在確認を逐次実行すると、リモート数に比例して待ち時間が増加します。
+**Action:** 優先順とエラー処理を維持しつつ、`Promise.allSettled` で存在確認を並列実行します。
