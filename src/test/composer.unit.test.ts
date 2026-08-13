@@ -636,6 +636,21 @@ suite("Composer Test Suite", () => {
       assert.ok(html.includes("document.body.style.cursor = 'wait';"));
     });
 
+    test("should reset UI state on reset message", () => {
+      const html = getComposerHtml(
+        mockWebview,
+        { title: "Test", showCreatePrCheckbox: true, showRequireApprovalCheckbox: true },
+        "nonce-123"
+      );
+      assert.ok(html.includes("if (event.data.type === 'reset')"));
+      assert.ok(html.includes("resetUI()"));
+      assert.ok(html.includes("submitButton.disabled = false;"));
+      assert.ok(html.includes("submitButton.removeAttribute('aria-busy');"));
+      assert.ok(html.includes("textarea.disabled = false;"));
+      assert.ok(html.includes("createPrCheckbox.disabled = false;"));
+      assert.ok(html.includes("requireApprovalCheckbox.disabled = false;"));
+    });
+
     test("should include prefers-reduced-motion media query for spinner", () => {
       const html = getComposerHtml(
         mockWebview,
@@ -672,8 +687,12 @@ suite("Composer Test Suite", () => {
       );
       assert.ok(html.includes("if (createPrCheckbox) {"));
       assert.ok(html.includes("createPrCheckbox.disabled = true;"));
+      assert.ok(html.includes("createPrCheckbox.title = 'Cannot change while sending';"));
+      assert.ok(html.includes("createPrCheckbox.setAttribute('aria-label', 'Create PR automatically? (Cannot change while sending)');"));
       assert.ok(html.includes("if (requireApprovalCheckbox) {"));
       assert.ok(html.includes("requireApprovalCheckbox.disabled = true;"));
+      assert.ok(html.includes("requireApprovalCheckbox.title = 'Cannot change while sending';"));
+      assert.ok(html.includes("requireApprovalCheckbox.setAttribute('aria-label', 'Require plan approval before execution? (Cannot change while sending)');"));
     });
   });
 });

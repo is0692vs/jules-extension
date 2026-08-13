@@ -281,9 +281,13 @@ export function getComposerHtml(
       textarea.disabled = true;
       if (createPrCheckbox) {
         createPrCheckbox.disabled = true;
+        createPrCheckbox.title = 'Cannot change while sending';
+        createPrCheckbox.setAttribute('aria-label', 'Create PR automatically? (Cannot change while sending)');
       }
       if (requireApprovalCheckbox) {
         requireApprovalCheckbox.disabled = true;
+        requireApprovalCheckbox.title = 'Cannot change while sending';
+        requireApprovalCheckbox.setAttribute('aria-label', 'Require plan approval before execution? (Cannot change while sending)');
       }
       const cancelButton = document.getElementById('cancel');
       if (cancelButton) {
@@ -304,6 +308,39 @@ export function getComposerHtml(
     submitButton.addEventListener('click', submit);
     document.getElementById('cancel').addEventListener('click', () => {
       vscode.postMessage({ type: 'cancel' });
+    });
+
+    const resetUI = () => {
+      submitButton.disabled = false;
+      submitButton.textContent = 'Send';
+      submitButton.removeAttribute('aria-busy');
+      const srStatus = document.getElementById('sr-status');
+      if (srStatus) srStatus.textContent = '';
+      textarea.disabled = false;
+      if (createPrCheckbox) {
+        createPrCheckbox.disabled = false;
+        createPrCheckbox.removeAttribute('title');
+        createPrCheckbox.setAttribute('aria-label', 'Create PR automatically?');
+      }
+      if (requireApprovalCheckbox) {
+        requireApprovalCheckbox.disabled = false;
+        requireApprovalCheckbox.removeAttribute('title');
+        requireApprovalCheckbox.setAttribute('aria-label', 'Require plan approval before execution?');
+      }
+      const cancelButton = document.getElementById('cancel');
+      if (cancelButton) {
+        cancelButton.disabled = false;
+        cancelButton.title = 'Cancel (Esc)';
+        cancelButton.setAttribute('aria-label', 'Cancel (Esc)');
+      }
+      document.body.style.cursor = 'default';
+      validate();
+    };
+
+    window.addEventListener('message', (event) => {
+      if (event.data.type === 'reset') {
+        resetUI();
+      }
     });
 
     textarea.addEventListener('input', validate);
