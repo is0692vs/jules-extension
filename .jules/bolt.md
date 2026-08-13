@@ -59,3 +59,6 @@
 
 **Learning:** リモートブランチの存在確認を逐次実行すると、リモート数に比例して待ち時間が増加します。
 **Action:** 各Promise内でエラーを捕捉して存在確認を並列開始し、結果は優先順に個別評価します。
+## 2026-08-13 - [Array includes Optimization]
+**Learning:** [Using `new Set(array).has()` for simple membership checks on arrays generates unnecessary intermediate Set objects and incurs an O(N) space and allocation penalty. `array.includes()` is much more efficient for this use case.]
+**Action:** [Always use `array.includes()` over `new Set().has()` for single array membership checks to avoid memory overhead.]
