@@ -59,3 +59,7 @@
 
 **Learning:** リモートブランチの存在確認を逐次実行すると、リモート数に比例して待ち時間が増加します。
 **Action:** 各Promise内でエラーを捕捉して存在確認を並列開始し、結果は優先順に個別評価します。
+
+## 2024-05-15 - [Set vs includes on Single-use checks]
+**Learning:** Instantiating `new Set(array)` just to check if it `.has(item)` allocates memory for the Set and the internal hash table. For single use or short arrays, `array.includes(item)` avoids the intermediate allocation and has significantly less overhead, acting as an effective micro-optimization.
+**Action:** Use `.includes()` instead of creating temporary Sets when performing single-use membership tests on simple arrays.
