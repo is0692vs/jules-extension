@@ -59,3 +59,7 @@
 
 **Learning:** リモートブランチの存在確認を逐次実行すると、リモート数に比例して待ち時間が増加します。
 **Action:** 各Promise内でエラーを捕捉して存在確認を並列開始し、結果は優先順に個別評価します。
+
+## 2025-05-13 - Avoid Math.max(...array) with large dynamic arrays
+**Learning:** Using `Math.max(...array.map(...))` on the results of a global regex match causes a "Maximum call stack size exceeded" error if the matched items exceed engine limits (usually ~100k items), and causes O(N) intermediate memory allocation.
+**Action:** Use a `for...of` loop to iterate and find the maximum value to avoid call stack limits and intermediate array allocations when dealing with regex match arrays or unbounded dynamically generated data.
