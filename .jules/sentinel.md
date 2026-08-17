@@ -35,3 +35,7 @@
 **Vulnerability:** コンポーザーWebviewが `localResourceRoots` を設定せずに初期化されており、Webviewにローカルファイルパスが露出する可能性がありました。
 **Learning:** ローカルリソースへの依存がない `createWebviewPanel` を使用する場合、アクセスを制限するために常に `localResourceRoots: []` を強制する必要があります。
 **Prevention:** すべての `vscode.window.createWebviewPanel` 呼び出しで明示的に `localResourceRoots` を設定します。
+## 2026-08-17 - CSPでのobject-src 'none'の明示的な設定
+**Vulnerability:** WebViewでのContent-Security-Policy (CSP) において、`default-src 'none'` が設定されていても、古いブラウザの挙動により `<object>`, `<embed>`, `<applet>` を通じて悪意のあるプラグインが実行されるリスクがあります。
+**Learning:** 防御の多層化（defense-in-depth）のベストプラクティスとして、フォールバックのバイパスを防ぐために `object-src 'none'` を明示的に設定する必要があります。
+**Prevention:** CSPを設定する際は、常に `object-src 'none'` を明示的に追加します。
