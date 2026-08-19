@@ -59,3 +59,6 @@
 
 **Learning:** リモートブランチの存在確認を逐次実行すると、リモート数に比例して待ち時間が増加します。
 **Action:** 各Promise内でエラーを捕捉して存在確認を並列開始し、結果は優先順に個別評価します。
+## 2026-08-19 - Avoid spread operator for large dynamic arrays
+**Learning:** Using the spread operator (e.g., `Math.max(...array)`) on large dynamic arrays, such as regex match results from large documents, causes a 'Maximum call stack size exceeded' error and unnecessary memory allocations.
+**Action:** Use an imperative `for...of` loop instead of spread syntax and `.map()` to process potentially unbounded arrays safely and efficiently.
