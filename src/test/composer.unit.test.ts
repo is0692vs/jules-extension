@@ -672,8 +672,10 @@ suite("Composer Test Suite", () => {
       );
       assert.ok(html.includes("if (createPrCheckbox) {"));
       assert.ok(html.includes("createPrCheckbox.disabled = true;"));
+      assert.ok(html.includes("createPrCheckbox.setAttribute('aria-label', 'Create PR automatically? (Cannot change while sending)');"));
       assert.ok(html.includes("if (requireApprovalCheckbox) {"));
       assert.ok(html.includes("requireApprovalCheckbox.disabled = true;"));
+      assert.ok(html.includes("requireApprovalCheckbox.setAttribute('aria-label', 'Require plan approval before execution? (Cannot change while sending)');"));
     });
   });
 });
