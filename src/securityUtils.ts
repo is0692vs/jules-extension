@@ -77,52 +77,9 @@ export function sanitizeForLogging(value: unknown, maxLength: number = 500): str
 }
 
 function stripAnsiEscapeSequences(value: string): string {
-    const result: string[] = [];
-
-    for (let i = 0; i < value.length; i += 1) {
-        if (value.charCodeAt(i) !== 0x1B) {
-            result.push(value[i]);
-            continue;
-        }
-
-        const next = value[i + 1];
-        if (!next) {
-            continue;
-        }
-
-        if (next === ']') {
-            i += 2;
-            while (i < value.length) {
-                if (value.charCodeAt(i) === 0x07) {
-                    break;
-                }
-                if (value.charCodeAt(i) === 0x1B && value[i + 1] === '\\') {
-                    i += 1;
-                    break;
-                }
-                i += 1;
-            }
-            continue;
-        }
-
-        if (next === '[') {
-            i += 2;
-            while (i < value.length) {
-                const code = value.charCodeAt(i);
-                if (code >= 0x40 && code <= 0x7E) {
-                    break;
-                }
-                i += 1;
-            }
-            continue;
-        }
-
-        const nextCode = next.charCodeAt(0);
-        if (nextCode >= 0x40 && nextCode <= 0x5F) {
-            i += 1;
-        }
-    }
-    return result.join('');
+    // パフォーマンス最適化: 文字ごとのループ処理を正規表現による一括置換に変更し、処理速度を大幅に向上
+    // eslint-disable-next-line no-control-regex
+    return value.replace(/\x1B(?:\](?:[^\x07\x1B]|\x1B(?!\\]|\\[\s\S]?))*(?:\x07|\x1B\\)?|\[[^@-~]*[@-~]?|[@-_]?)/g, '');
 }
 
 /**
