@@ -59,3 +59,7 @@
 
 **Learning:** リモートブランチの存在確認を逐次実行すると、リモート数に比例して待ち時間が増加します。
 **Action:** 各Promise内でエラーを捕捉して存在確認を並列開始し、結果は優先順に個別評価します。
+
+## 2026-08-22 - [Performance] Eliminating spread operators in regex match arrays
+**Learning:** 巨大なマークダウン文書などをパースした際の大量の正規表現マッチ結果配列に対して、スプレッド構文（例: `Math.max(...matches)`）を使用すると 'Maximum call stack size exceeded' エラーが発生するリスクがあります。
+**Action:** 動的で要素数が肥大化する可能性のある配列を処理する場合は、スプレッド構文や中間配列を生成する `.map()` を避け、`for...of` ループを使用した命令的な処理に置き換えることで、コールスタックエラーを防ぎメモリ消費を抑えます。
