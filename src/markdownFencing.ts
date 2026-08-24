@@ -7,9 +7,19 @@
 export function buildFencedCodeBlock(code: string, languageId: string): string {
     // Find the longest sequence of backticks in the code
     const backtickMatches = code.match(/`+/g);
-    const longestBacktickSequence = backtickMatches 
-        ? Math.max(...backtickMatches.map(m => m.length)) 
-        : 0;
+    let longestBacktickSequence = 0;
+
+    // パフォーマンス最適化: 巨大なマークダウンドキュメントを解析する際、
+    // 正規表現のマッチ結果配列に対してスプレッド構文を用いた Math.max(...array) や
+    // .map() による中間配列の生成を避けることで、"Maximum call stack size exceeded"
+    // エラーを防ぎ、メモリ割り当てを削減します。
+    if (backtickMatches) {
+        for (const match of backtickMatches) {
+            if (match.length > longestBacktickSequence) {
+                longestBacktickSequence = match.length;
+            }
+        }
+    }
     
     // Use at least 3 backticks, or one more than the longest sequence found
     const fenceLength = Math.max(3, longestBacktickSequence + 1);

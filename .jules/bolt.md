@@ -59,3 +59,6 @@
 
 **Learning:** リモートブランチの存在確認を逐次実行すると、リモート数に比例して待ち時間が増加します。
 **Action:** 各Promise内でエラーを捕捉して存在確認を並列開始し、結果は優先順に個別評価します。
+## 2026-08-24 - [Performance] Eliminating spread operators in array max logic
+**Learning:** When finding the maximum length among a large number of regex matches (e.g. backticks in markdown), using Math.max(...matches.map(...)) creates unnecessary intermediate arrays and causes 'Maximum call stack size exceeded' on very large inputs.
+**Action:** Use a single-pass for...of loop to determine the maximum length dynamically without spread operators or intermediate array allocations.
