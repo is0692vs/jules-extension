@@ -254,19 +254,19 @@ export function buildChatMessagesFromActivities(
     const actId = escapeHtml(activity.id ?? activity.name);
     if (activity.sessionFailed?.reason) {
       detailsHtml +=
-        '<details class="activity-details"><summary>View Error Details</summary><div class="details-content code-block"><pre><code>' +
+        '<details class="activity-details"><summary>View Error Details</summary><div class="details-content code-block" tabindex="0" role="region" aria-label="Error details"><pre><code>' +
         escapeHtml(activity.sessionFailed.reason) +
         "</code></pre></div></details>";
     }
     if (activity.planGenerated?.plan) {
       detailsHtml +=
-        '<details class="activity-details" data-activity-id="' + actId + '" data-detail-type="plan"><summary>View Plan</summary><div class="details-content">Loading...</div></details>';
+        '<details class="activity-details" data-activity-id="' + actId + '" data-detail-type="plan"><summary>View Plan</summary><div class="details-content" tabindex="0" role="region" aria-label="Plan details">Loading...</div></details>';
     }
     if ((activity as any).gitPatch?.diff) {
       const diff = (activity as any).gitPatch.diff;
       if (typeof diff === "string" && diff.trim().length > 0) {
         detailsHtml +=
-          '<details class="activity-details" data-activity-id="' + actId + '" data-detail-type="diff"><summary>View Diff</summary><div class="details-content">Loading...</div></details>';
+          '<details class="activity-details" data-activity-id="' + actId + '" data-detail-type="diff"><summary>View Diff</summary><div class="details-content" tabindex="0" role="region" aria-label="Diff details">Loading...</div></details>';
       }
     }
     if (activity.artifacts && activity.artifacts.length > 0) {
@@ -277,12 +277,12 @@ export function buildChatMessagesFromActivities(
             detailsHtml +=
               '<details class="activity-details" data-activity-id="' + actId + '" data-detail-type="changeset" data-index="' + i + '"><summary>View ChangeSet (' +
               (i + 1) +
-              ')</summary><div class="details-content">Loading...</div></details>';
+              ')</summary><div class="details-content" tabindex="0" role="region" aria-label="Changeset details">Loading...</div></details>';
           } else {
             detailsHtml +=
               '<details class="activity-details" data-activity-id="' + actId + '" data-detail-type="changeset-raw" data-index="' + i + '"><summary>View ChangeSet Details (' +
               (i + 1) +
-              ')</summary><div class="details-content">Loading...</div></details>';
+              ')</summary><div class="details-content" tabindex="0" role="region" aria-label="Changeset raw details">Loading...</div></details>';
           }
         }
         if (artifact.bashOutput) {
@@ -298,7 +298,7 @@ export function buildChatMessagesFromActivities(
             detailsHtml +=
               '<details class="activity-details" data-activity-id="' + actId + '" data-detail-type="bash" data-index="' + i + '"><summary>View Bash Output (' +
               (i + 1) +
-              ')</summary><div class="details-content">Loading...</div></details>';
+              ')</summary><div class="details-content" tabindex="0" role="region" aria-label="Bash output details">Loading...</div></details>';
           }
         }
       });
@@ -514,7 +514,7 @@ export function getChatWebviewHtml(
     nonce +
     '">' +
     CHAT_CSS +
-    '</style></head><body><div id="chat"></div><div id="typing" class="typing" aria-live="polite" aria-atomic="true" aria-label="Jules is working"><span>Jules is working</span><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div><form id="composer"><textarea id="messageInput" aria-label="Enter message" placeholder="Enter message (Ctrl/Cmd+Enter to send)" required></textarea><div class="composer-actions"><div id="sessionLabel" class="session-label" aria-live="polite" aria-atomic="true">Session: None selected</div><button id="sendButton" type="submit" aria-label="Send message" disabled>Send</button></div></form><script nonce="' +
+    '</style></head><body><div id="chat" tabindex="0" role="region" aria-label="Chat messages"></div><div id="typing" class="typing" aria-live="polite" aria-atomic="true" aria-label="Jules is working"><span>Jules is working</span><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div><form id="composer"><textarea id="messageInput" aria-label="Enter message" placeholder="Enter message (Ctrl/Cmd+Enter to send)" required></textarea><div class="composer-actions"><div id="sessionLabel" class="session-label" aria-live="polite" aria-atomic="true">Session: None selected</div><button id="sendButton" type="submit" aria-label="Send message" disabled>Send</button></div></form><script nonce="' +
     nonce +
     '" src="' +
     domPurifyScriptUri +

@@ -2,6 +2,7 @@ export const CHAT_CSS = `
 * { box-sizing: border-box; }
 body { margin: 0; padding: 10px; color: var(--vscode-editor-foreground); background: var(--vscode-editor-background); font-family: var(--vscode-font-family); height: 100vh; display: flex; flex-direction: column; gap: 10px; }
 #chat { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 2px; }
+#chat:focus-visible, .details-content:focus-visible { outline: 1px solid var(--vscode-focusBorder); outline-offset: -1px; }
 .message { display: flex; flex-direction: column; max-width: 92%; animation: slide-in .18s ease-out; gap: 4px; }
 .message.user { margin-left: auto; align-items: flex-end; }
 .message.assistant { margin-right: auto; align-items: flex-start; }
