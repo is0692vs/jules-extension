@@ -43,6 +43,7 @@ p { margin: 0 0 8px; }
 .activity-details summary:focus-visible { outline: 1px solid var(--vscode-focusBorder); outline-offset: 2px; }
 .activity-details summary:hover { opacity: 1; text-decoration: underline; }
 .details-content { margin-top: 6px; padding: 10px; background: var(--vscode-editor-background); border: 1px solid var(--vscode-widget-border); border-radius: 6px; max-height: 350px; overflow-y: auto; }
+.details-content:focus-visible { outline: 1px solid var(--vscode-focusBorder); outline-offset: -1px; }
 .details-content pre { margin: 0; white-space: pre-wrap; word-break: break-all; }
 details[aria-busy="true"] .details-content { animation: pulse 1.5s infinite; opacity: 0.7; }
 @keyframes pulse { 0%, 100% { opacity: 0.7; } 50% { opacity: 0.4; } }
