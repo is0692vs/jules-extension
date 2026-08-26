@@ -59,3 +59,7 @@
 
 **Learning:** リモートブランチの存在確認を逐次実行すると、リモート数に比例して待ち時間が増加します。
 **Action:** 各Promise内でエラーを捕捉して存在確認を並列開始し、結果は優先順に個別評価します。
+
+## 2026-08-26 - [Performance] Eliminating spread operators for unbounded dynamic arrays
+**Learning:** Using spread syntax (...array) with dynamically sized arrays (like regex match results from large markdown files) can cause "Maximum call stack size exceeded" errors and unnecessary memory allocations via intermediate mapping.
+**Action:** Use an imperative for...of loop instead of Math.max(...matches.map()) when finding the maximum length in potentially unbounded dynamic string matches.
