@@ -59,3 +59,7 @@
 
 **Learning:** リモートブランチの存在確認を逐次実行すると、リモート数に比例して待ち時間が増加します。
 **Action:** 各Promise内でエラーを捕捉して存在確認を並列開始し、結果は優先順に個別評価します。
+
+## 2026-08-27 - [Performance] Eliminating spread operators for large regex match arrays
+**Learning:** When processing regex match results from parsing large markdown documents, passing the array to functions using the spread syntax (e.g., `Math.max(...matches)`) causes a 'Maximum call stack size exceeded' error and unnecessary memory allocations.
+**Action:** Use an imperative `for...of` loop instead of spread syntax and `.map()` to prevent crashes on large inputs and eliminate intermediate array overhead.
