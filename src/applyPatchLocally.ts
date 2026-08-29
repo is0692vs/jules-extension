@@ -82,7 +82,7 @@ export async function applyPatchLocallyForSession(options: {
         if (baseCommitId) {
             try {
                 await repository.getCommit(baseCommitId);
-            } catch (e) {
+            } catch (_e) {
                 log(`Commit ${baseCommitId} not found in repository after fetch.`);
                 commitToBranchFrom = undefined;
             }
@@ -232,7 +232,7 @@ async function restoreOriginalBranchAfterApplyFailure(
 async function branchExists(repository: any, branchRef: string): Promise<boolean> {
     try {
         return !!(await repository.getBranch(branchRef));
-    } catch (error) {
+    } catch (error: any) {
         if (isBranchNotFoundError(error)) {
             return false;
         }
@@ -294,7 +294,7 @@ async function findAvailableBranchName(repository: any, branchName: string): Pro
             const branches = await repository.getBranches({ remote: false });
             existingBranchNames = new Set(branches.map((b: any) => b.name));
         }
-    } catch (e) {
+    } catch (_e) {
         // Fallback to sequential checks if getBranches fails
     }
 
@@ -311,7 +311,7 @@ async function findAvailableBranchName(repository: any, branchName: string): Pro
                 if (!branch) {
                     return candidate;
                 }
-            } catch (error) {
+            } catch (error: any) {
                 if (isBranchNotFoundError(error)) {
                     return candidate;
                 }
