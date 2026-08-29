@@ -59,3 +59,7 @@
 
 **Learning:** リモートブランチの存在確認を逐次実行すると、リモート数に比例して待ち時間が増加します。
 **Action:** 各Promise内でエラーを捕捉して存在確認を並列開始し、結果は優先順に個別評価します。
+
+## 2026-08-01 - [Performance Regression via Over-Optimization]
+**Learning:** Removing a `Set` lookup within a loop and replacing it with `.includes()` without proper test coverage can introduce algorithmic slowdowns (turning O(N) to O(N*M)) and regression risks.
+**Action:** Do not apply `Set` to `.includes()` optimizations inside nested loops. If a PR is rejected due to these risks, document the lesson and avoid aggressive micro-optimizations in poorly covered areas.
