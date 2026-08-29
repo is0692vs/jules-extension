@@ -36,3 +36,6 @@
 ## 2026-07-30 - 無効化状態の理由の明示
 **Learning:** 非同期処理中にインタラクティブな要素（ボタンなど）を無効にする際、単に disabled 属性に頼るだけではスクリーンリーダーなどの支援技術ユーザーにコンテキストが伝わらない。
 **Action:** 無効化する際は常に title および aria-label 属性を設定し、なぜ無効化されているのか（例：'Cannot cancel while sending'）をすべてのユーザーに明示的に説明する。
+## 2025-05-12 - チェックボックス無効化時のARIAラベル結合
+**Learning:** 紐付いた <label> をアクセシブルネームとして依存しているチェックボックスに動的に aria-label を追加すると、新しい aria-label が <label> の内容を完全に上書きしてしまいます。
+**Action:** スクリーンリーダーへのコンテキストを維持するため、元のラベルテキストと無効化の理由を結合した文字列（例：'Create PR automatically? (Cannot change while sending)'）を aria-label に設定すること。
