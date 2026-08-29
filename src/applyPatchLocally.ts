@@ -82,7 +82,7 @@ export async function applyPatchLocallyForSession(options: {
         if (baseCommitId) {
             try {
                 await repository.getCommit(baseCommitId);
-            } catch (e) {
+            } catch (_e) {
                 log(`Commit ${baseCommitId} not found in repository after fetch.`);
                 commitToBranchFrom = undefined;
             }
@@ -232,7 +232,7 @@ async function restoreOriginalBranchAfterApplyFailure(
 async function branchExists(repository: any, branchRef: string): Promise<boolean> {
     try {
         return !!(await repository.getBranch(branchRef));
-    } catch (error) {
+    } catch (error: any) {
         if (isBranchNotFoundError(error)) {
             return false;
         }
@@ -287,18 +287,36 @@ export async function resolveStartingBranchRef(repository: any, startingBranch: 
 }
 
 async function findAvailableBranchName(repository: any, branchName: string): Promise<string> {
+    let existingBranchNames: Set<string> | undefined;
+
+    try {
+        if (typeof repository.getBranches === "function") {
+            const branches = await repository.getBranches({ remote: false });
+            existingBranchNames = new Set(branches.map((b: any) => b.name));
+        }
+    } catch (_e) {
+        // Fallback to sequential checks if getBranches fails
+    }
+
     for (let attempt = 1; attempt <= MAX_BRANCH_NAME_ATTEMPTS; attempt += 1) {
         const candidate = attempt === 1 ? branchName : `${branchName}-${attempt}`;
-        try {
-            const branch = await repository.getBranch(candidate);
-            if (!branch) {
+
+        if (existingBranchNames) {
+            if (!existingBranchNames.has(candidate)) {
                 return candidate;
             }
-        } catch (error) {
-            if (isBranchNotFoundError(error)) {
-                return candidate;
+        } else {
+            try {
+                const branch = await repository.getBranch(candidate);
+                if (!branch) {
+                    return candidate;
+                }
+            } catch (error: any) {
+                if (isBranchNotFoundError(error)) {
+                    return candidate;
+                }
+                throw error;
             }
-            throw error;
         }
     }
     throw new Error(`Could not find an available branch name after ${MAX_BRANCH_NAME_ATTEMPTS} attempts.`);
