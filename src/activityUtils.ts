@@ -21,6 +21,8 @@ export const ACTIVITY_UNION_KEYS = [
 
 export type ActivityUnionKey = (typeof ACTIVITY_UNION_KEYS)[number];
 
+export const ACTIVITY_UNION_KEYS_SET = new Set(ACTIVITY_UNION_KEYS);
+
 /**
  * Activity のアクティブなキーを取得
  * @param activity Activity オブジェクト
@@ -47,14 +49,12 @@ export function getActiveActivityKeys(activity: Activity): ActivityUnionKey[] {
  * @returns 破損している場合はtrue
  */
 export function isActivityCorrupted(activity: Activity): boolean {
-    const activeKeys = getActiveActivityKeys(activity);
-
-    if (
-        activity.type &&
-        (ACTIVITY_UNION_KEYS as readonly string[]).includes(activity.type) &&
-        !activeKeys.includes(activity.type as ActivityUnionKey)
-    ) {
-        return true;
+    if (activity.type && ACTIVITY_UNION_KEYS_SET.has(activity.type as ActivityUnionKey)) {
+        const activeKeys = getActiveActivityKeys(activity);
+        const activeKeysSet = new Set(activeKeys);
+        if (!activeKeysSet.has(activity.type as ActivityUnionKey)) {
+            return true;
+        }
     }
 
     return false;
