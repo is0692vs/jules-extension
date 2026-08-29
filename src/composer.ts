@@ -281,9 +281,13 @@ export function getComposerHtml(
       textarea.disabled = true;
       if (createPrCheckbox) {
         createPrCheckbox.disabled = true;
+        createPrCheckbox.title = 'Create PR automatically? (Cannot change while sending)';
+        createPrCheckbox.setAttribute('aria-label', 'Create PR automatically? (Cannot change while sending)');
       }
       if (requireApprovalCheckbox) {
         requireApprovalCheckbox.disabled = true;
+        requireApprovalCheckbox.title = 'Require plan approval before execution? (Cannot change while sending)';
+        requireApprovalCheckbox.setAttribute('aria-label', 'Require plan approval before execution? (Cannot change while sending)');
       }
       const cancelButton = document.getElementById('cancel');
       if (cancelButton) {
