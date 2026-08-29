@@ -26,11 +26,14 @@ suite('markdownFencing Unit Tests', () => {
         assert.strictEqual(result, '```\nplain text\n```');
     });
 
-    test('handles many backtick matches without overflowing the stack', () => {
-        const code = 'a`'.repeat(100_000);
+    test('buildFencedCodeBlock should handle massive amount of backticks without stack overflow', () => {
+        const backtickSegment = '`code` ';
+        const massiveCode = backtickSegment.repeat(100000);
 
-        assert.doesNotThrow(() => buildFencedCodeBlock(code, 'text'));
-        const result = buildFencedCodeBlock(code, 'text');
+        // This should not throw "Maximum call stack size exceeded"
+        const result = buildFencedCodeBlock(massiveCode, 'text');
+
+        // Output should be fenced with 3 backticks since the longest sequence is 1
         assert.ok(result.startsWith('```text\n'));
         assert.ok(result.endsWith('\n```'));
     });
