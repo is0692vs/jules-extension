@@ -25,4 +25,13 @@ suite('markdownFencing Unit Tests', () => {
         const result = buildFencedCodeBlock(code, '');
         assert.strictEqual(result, '```\nplain text\n```');
     });
+
+    test('handles many backtick matches without overflowing the stack', () => {
+        const code = 'a`'.repeat(100_000);
+
+        assert.doesNotThrow(() => buildFencedCodeBlock(code, 'text'));
+        const result = buildFencedCodeBlock(code, 'text');
+        assert.ok(result.startsWith('```text\n'));
+        assert.ok(result.endsWith('\n```'));
+    });
 });
