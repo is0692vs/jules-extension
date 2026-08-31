@@ -56,9 +56,10 @@ export async function initMarkdownRenderer(): Promise<void> {
         const rendered = defaultFence
           ? defaultFence(tokens, idx, options, env, self)
           : self.renderToken(tokens, idx, options);
+        const accessibleRendered = rendered.replace(/<pre([^>]*)>/i, '<pre$1 tabindex="0" role="region" aria-label="Code block">');
         return (
           '<div class="code-block"><button class="copy-code-button" type="button" title="Copy code" aria-label="Copy code" aria-live="polite" aria-atomic="true">Copy</button>' +
-          rendered +
+          accessibleRendered +
           "</div>"
         );
       };
@@ -254,19 +255,19 @@ export function buildChatMessagesFromActivities(
     const actId = escapeHtml(activity.id ?? activity.name);
     if (activity.sessionFailed?.reason) {
       detailsHtml +=
-        '<details class="activity-details"><summary>View Error Details</summary><div class="details-content code-block"><pre><code>' +
+        '<details class="activity-details"><summary>View Error Details</summary><div class="details-content code-block" tabindex="0" role="region" aria-label="Error details"><pre><code>' +
         escapeHtml(activity.sessionFailed.reason) +
         "</code></pre></div></details>";
     }
     if (activity.planGenerated?.plan) {
       detailsHtml +=
-        '<details class="activity-details" data-activity-id="' + actId + '" data-detail-type="plan"><summary>View Plan</summary><div class="details-content">Loading...</div></details>';
+        '<details class="activity-details" data-activity-id="' + actId + '" data-detail-type="plan"><summary>View Plan</summary><div class="details-content" tabindex="0" role="region" aria-label="Plan details">Loading...</div></details>';
     }
     if ((activity as any).gitPatch?.diff) {
       const diff = (activity as any).gitPatch.diff;
       if (typeof diff === "string" && diff.trim().length > 0) {
         detailsHtml +=
-          '<details class="activity-details" data-activity-id="' + actId + '" data-detail-type="diff"><summary>View Diff</summary><div class="details-content">Loading...</div></details>';
+          '<details class="activity-details" data-activity-id="' + actId + '" data-detail-type="diff"><summary>View Diff</summary><div class="details-content" tabindex="0" role="region" aria-label="Diff details">Loading...</div></details>';
       }
     }
     if (activity.artifacts && activity.artifacts.length > 0) {
@@ -277,12 +278,12 @@ export function buildChatMessagesFromActivities(
             detailsHtml +=
               '<details class="activity-details" data-activity-id="' + actId + '" data-detail-type="changeset" data-index="' + i + '"><summary>View ChangeSet (' +
               (i + 1) +
-              ')</summary><div class="details-content">Loading...</div></details>';
+              ')</summary><div class="details-content" tabindex="0" role="region" aria-label="ChangeSet details">Loading...</div></details>';
           } else {
             detailsHtml +=
               '<details class="activity-details" data-activity-id="' + actId + '" data-detail-type="changeset-raw" data-index="' + i + '"><summary>View ChangeSet Details (' +
               (i + 1) +
-              ')</summary><div class="details-content">Loading...</div></details>';
+              ')</summary><div class="details-content" tabindex="0" role="region" aria-label="ChangeSet details">Loading...</div></details>';
           }
         }
         if (artifact.bashOutput) {
@@ -298,7 +299,7 @@ export function buildChatMessagesFromActivities(
             detailsHtml +=
               '<details class="activity-details" data-activity-id="' + actId + '" data-detail-type="bash" data-index="' + i + '"><summary>View Bash Output (' +
               (i + 1) +
-              ')</summary><div class="details-content">Loading...</div></details>';
+              ')</summary><div class="details-content" tabindex="0" role="region" aria-label="Bash output details">Loading...</div></details>';
           }
         }
       });

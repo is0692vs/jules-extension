@@ -14,6 +14,7 @@ ul, ol { padding-left: 18px; margin: 6px 0; }
 p { margin: 0 0 8px; }
 .code-block { position: relative; margin: 8px 0; }
 .code-block pre { margin: 0; padding: 10px; border-radius: 8px; background: var(--vscode-textCodeBlock-background); overflow-x: auto; border: 1px solid var(--vscode-widget-border, transparent); }
+.code-block pre:focus-visible { outline: 1px solid var(--vscode-focusBorder); outline-offset: -1px; }
 .code-block code { font-family: var(--vscode-editor-font-family); font-size: var(--vscode-editor-font-size); }
 .copy-code-button { position: absolute; top: 6px; right: 6px; opacity: 0; transition: opacity .15s ease; border: 1px solid var(--vscode-button-border, transparent); background: var(--vscode-button-secondaryBackground); color: var(--vscode-button-secondaryForeground); padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; }
 .code-block:hover .copy-code-button, .copy-code-button:focus-visible { opacity: 1; }
@@ -44,6 +45,7 @@ p { margin: 0 0 8px; }
 .activity-details summary:hover { opacity: 1; text-decoration: underline; }
 .details-content { margin-top: 6px; padding: 10px; background: var(--vscode-editor-background); border: 1px solid var(--vscode-widget-border); border-radius: 6px; max-height: 350px; overflow-y: auto; }
 .details-content pre { margin: 0; white-space: pre-wrap; word-break: break-all; }
+.details-content:focus-visible { outline: 1px solid var(--vscode-focusBorder); outline-offset: -1px; }
 details[aria-busy="true"] .details-content { animation: pulse 1.5s infinite; opacity: 0.7; }
 @keyframes pulse { 0%, 100% { opacity: 0.7; } 50% { opacity: 0.4; } }
 @media (prefers-reduced-motion: reduce) { details[aria-busy="true"] .details-content { animation: none; opacity: 0.7; } }
