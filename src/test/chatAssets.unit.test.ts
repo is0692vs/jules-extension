@@ -791,8 +791,8 @@ suite("chatAssets unit tests", () => {
     assert.strictEqual(elements.messageInput["aria-label"], elements.messageInput.placeholder);
     assert.strictEqual(elements.messageInput.title, elements.messageInput.placeholder);
     assert.strictEqual(elements.sendButton.disabled, true);
-    assert.strictEqual(elements.sendButton.title, "Select a session to send a message");
-    assert.strictEqual(elements.sendButton["aria-label"], "Send (Select a session to send a message)");
+    assert.strictEqual(elements.sendButton.title, "Select a session to send a message (Cannot send without an active session)");
+    assert.strictEqual(elements.sendButton["aria-label"], "Send (Cannot send without an active session)");
     assert.strictEqual(elements.sessionLabel.textContent, "Session: None selected");
     assert.strictEqual(elements.sessionLabel.title, "Session: None selected");
 
@@ -800,8 +800,8 @@ suite("chatAssets unit tests", () => {
     elements.messageInput.value = "   "; // whitespace
     messageListener({ data: { type: "chatState", payload: { sessionId: "session-123", messages: [], isTyping: false } } });
     assert.strictEqual(elements.sendButton.disabled, true);
-    assert.strictEqual(elements.sendButton.title, "Type a message to send");
-    assert.strictEqual(elements.sendButton["aria-label"], "Send (Type a message to send)");
+    assert.strictEqual(elements.sendButton.title, "Type a message to send (Cannot send an empty message)");
+    assert.strictEqual(elements.sendButton["aria-label"], "Send (Cannot send an empty message)");
     assert.strictEqual(elements.sessionLabel.textContent, "Session: session-123");
     assert.strictEqual(elements.sessionLabel.title, "Session: session-123");
 

@@ -247,11 +247,11 @@ export const CHAT_JS = `(function() {
     messageInput.title = messageInput.placeholder;
 
     if (!hasSession) {
-      sendButton.title = "Select a session to send a message";
-      sendButton.setAttribute("aria-label", "Send (Select a session to send a message)");
+      sendButton.title = "Select a session to send a message (Cannot send without an active session)";
+      sendButton.setAttribute("aria-label", "Send (Cannot send without an active session)");
     } else if (!hasText) {
-      sendButton.title = "Type a message to send";
-      sendButton.setAttribute("aria-label", "Send (Type a message to send)");
+      sendButton.title = "Type a message to send (Cannot send an empty message)";
+      sendButton.setAttribute("aria-label", "Send (Cannot send an empty message)");
     } else {
       sendButton.title = "Send message (Ctrl/Cmd+Enter)";
       sendButton.setAttribute("aria-label", "Send message (Ctrl/Cmd+Enter)");
